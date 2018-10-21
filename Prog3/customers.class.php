@@ -1,8 +1,7 @@
 <?php
-session_start();
-if(!isset($_SESSION["username"])) {
-    header("Location: login.php");
-}
+
+//import PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
 
 class Customers {
     
@@ -20,6 +19,14 @@ class Customers {
     
     private $title = "Customer";
     
+	//########################################################
+    //Purpose: Displays a form to create a new account.   
+    //Preconditions: None. 
+    //Postconditions: Makes a call to join_insert() if user clicks Create button.
+    //Input: Name, Email, Mobile and Password.
+    //Output: Redirects to join_insert(). 
+    //Notes: None.
+    //########################################################
     function join() {
         echo "
         <html>
@@ -46,7 +53,7 @@ class Customers {
         $this->control_group("name", $this->nameError, $this->name);
         $this->control_group("email", $this->emailError, $this->email);
         $this->control_group("mobile", $this->mobileError, $this->mobile);
-        $this->control_group("password", $this->passwordError, $this->password_hash);
+        $this->control_group("password_hash", $this->passwordError, $this->password_hash);
         echo " 
                             <div class='form-actions'>
                                 <button type='submit' class='btn btn-success'>Create</button>
@@ -59,18 +66,22 @@ class Customers {
             </body>
         </html>
                     ";
-    }
+    } //end join()
     
     
     //########################################################
     //Purpose: Displays a form to create a new entry.   
     //Preconditions: There must be a valid fun.
     //Postconditions: Makes a call to insert_record() if user clicks Create button.
-    //Input: none
+    //Input: Name, Email and Mobile.
     //Output: none
     //Notes: None.
     //########################################################
     function create_record() { // display create form
+        session_start();
+        if(!isset($_SESSION["username"])) {
+            header("Location: login.php");
+        }
         echo "
         <html>
             <head>
@@ -108,7 +119,7 @@ class Customers {
             </body>
         </html>
                     ";
-    }
+    } // end create_record()
     
     //########################################################
     //Purpose: Prints out the name, email and mobile fields for 
@@ -120,6 +131,10 @@ class Customers {
     //Notes: None.
     //########################################################
     function list_records() {
+        session_start();
+        if(!isset($_SESSION["username"])) {
+            header("Location: login.php");
+        }
         echo "
 		
         <html>
@@ -140,6 +155,7 @@ class Customers {
                     </p>
                     <p>
                         <a href='customer.php?fun=1' class='btn btn-success'>Create</a>
+                        <a href='logout.php' >Log Out</a>
                     </p>
                     <div class='row'>
                         <table class='table table-striped table-bordered'>
@@ -186,9 +202,9 @@ class Customers {
     //########################################################
     //Purpose: Creates an input field for a selected variable.  
     //Preconditions: There must be a valid id and fun. 
-    //Postconditions: An input field an associated variable is output.
-    //Input: none
-    //Output: none
+    //Postconditions: An input field of an associated variable is output.
+    //Input: Lable, LabelError, Value
+    //Output: Input fields. 
     //Notes: None.
     //########################################################
     function control_group ($label, $labelError, $val) { 
@@ -207,14 +223,14 @@ class Customers {
         }
         echo "</div>";
         echo "</div>";
-    }
+    } //end control_group()
 	
 	//########################################################
 	//Purpose: Produces a page to confirm the deleting of a record. 
 	//Preconditions: There must be a valid id and fun. 
 	//Postconditions: delete_record() is called if the user confirms the deletion. 
-	//Input: none
-	//Output: none
+	//Input: Submit button. 
+	//Output: Redirects to delete_record().
 	//Notes: None.
 	//########################################################
 	function delete_page () { //page to confirm deletion
@@ -256,7 +272,7 @@ class Customers {
 	//Preconditions: There must be a valid id and fun. 
 	//Postconditions: The record is deleted and user is returned to list_records().
 	//Input: none
-	//Output: none
+	//Output: Redirects to customer.php.
 	//Notes: None.
 	//########################################################
 	function delete_record () { //deletes a record
@@ -270,14 +286,14 @@ class Customers {
 		Database::disconnect();
 		header("Location: customer.php");
 			
-	}
+	} //end delete_record()
 	
 	//########################################################
 	//Purpose: Produces a page to enter and confirm an update to a record. 
 	//Preconditions: There must be a valid id and fun. 
 	//Postconditions: If the user selects yes, update_record() is called. 
-	//Input: none
-	//Output: none
+	//Input: Name, Email, and Mobile
+	//Output: Redirects to update_record().
 	//Notes: None.
 	//########################################################
 	function update () {
@@ -330,8 +346,8 @@ class Customers {
 	//Preconditions: There must be a valid id and fun. There must be a valid
 	//entry in the name, email and mobile input boxes. 
 	//Postconditions: The record is updated. 
-	//Input: none
-	//Output: none
+	//Input: Name, Email and Mobile
+	//Output: Redirects to customers.php.
 	//Notes: None.
 	//########################################################
 	function update_record () {
@@ -368,7 +384,7 @@ class Customers {
             $this->update();
         }
 	
-	}
+	} // end update_record()
 	
 	//########################################################
 	//Purpose: Prints out the information in a record onto a page
@@ -459,8 +475,8 @@ class Customers {
 	//Preconditions: There must be a valid id and fun.
 	//Postconditions: The record is updated or the user is returned to
 	//the create_record page if the data is invalid. 
-	//Input: none
-	//Output: none
+	//Input: Name, Email, Mobile
+	//Output: Redirects to create_record(). 
 	//Notes: None.
 	//########################################################
     function insert_record () {
@@ -494,8 +510,17 @@ class Customers {
         else {
             $this->create_record();
         }
-    }
+    } //end insert_record()
     
+	//########################################################
+	//Purpose: Inserts a record into the database.  
+	//Preconditions: There must be a valid id and fun.
+	//Postconditions: The record is created or the user is returned to
+	//the join() page if the data is invalid. 
+	//Input: Name, Email, Mobile
+	//Output: Redirects to join() or login.php. 
+	//Notes: None.
+	//########################################################
     function join_insert () {
         // validate input
         $valid = true;
@@ -521,17 +546,32 @@ class Customers {
 
         // insert data
         if ($valid) {
+            //create a random token
+            $token = $this->name.random_int(0, 100000000);
             $pdo = Database::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "INSERT INTO customers (name,email,mobile, password_hash) values(?, ?, ?, ?)";
+            $sql = "INSERT INTO customers (name,email,mobile,password_hash,confirm_code) values(?, ?, ?, ?, ?)";
             $q = $pdo->prepare($sql);
-            $q->execute(array($this->name,$this->email,$this->mobile,MD5($this->password_hash)));
+            $q->execute(array($this->name,$this->email,$this->mobile,MD5($this->password_hash),$token));
             Database::disconnect();
-            header("Location: customer.php");
+            //send confirmation email
+            include_once __DIR__ . "/PHPMailer.php";
+            $mail = new PHPMailer();
+            $mail->setFrom('Tucker@tsmccart.000webhostapp.com');
+            $mail->addAddress($this->email, $this->name);
+            $mail->Subject = "Please verify email!";
+            $mail->isHTML(true);
+            $mail->Body = "Please click the link below to confirm your email address!<br><br> "
+                    . "tsmccart.000webhostapp.com/prog3/confirm.php?token=$token&email=$this->email";
+            header("Location: login.php?confirms=Please check your email to confirm your account in order to be able to log in!");
+            if($mail->send()) {
+                //echo("<script type='text/javascript'> var answer = prompt('".works."'); </script>");
+
+            }
         }
         else {
             $this->join();
         }
-    }
+    } // end join_insert()
     
 } // end class Customers

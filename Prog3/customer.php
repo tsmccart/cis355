@@ -7,6 +7,7 @@ $cust = new Customers();
 if(isset($_POST["name"])) $cust->name = $_POST["name"];
 if(isset($_POST["email"])) $cust->email = $_POST["email"];
 if(isset($_POST["mobile"])) $cust->mobile = $_POST["mobile"];
+if(isset($_POST["password_hash"])) $cust->password_hash = $_POST["password_hash"];
 
 if(isset($_GET["fun"])) $fun = $_GET["fun"];
 else $fun = 0;
