@@ -597,7 +597,7 @@ class Customers {
         // insert data
         if ($valid) {
             //create a random token
-            $token = $this->name.random_int(0, 100000000);
+            $token = random_int(0, 100000000);
             $pdo = Database::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $sql = "INSERT INTO customers (name,email,mobile,password_hash,confirm_code) values(?, ?, ?, ?, ?)";
@@ -612,7 +612,7 @@ class Customers {
             $mail->Subject = "Please verify email!";
             $mail->isHTML(true);
             $mail->Body = "Please click the link below to confirm your email address!<br><br> "
-                    . "tsmccart.000webhostapp.com/prog3/confirm.php?token=$token&email=$this->email";
+                    . "tsmccart.000webhostapp.com/prog4/confirm.php?token=$token&email=$this->email";
             header("Location: login.php?confirms=Please check your email to confirm your account in order to be able to log in!");
             if($mail->send()) {
                 //echo("<script type='text/javascript'> var answer = prompt('".works."'); </script>");
